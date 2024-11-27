@@ -1,0 +1,175 @@
+﻿@model IEMS.Models.Expense
+
+@{
+    ViewData["Title"] = "Expense Details";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Background and card styling */
+        body {
+            background: url('/images/pexels-olia-danilevich-5466785.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-blend-mode: overlay;
+            font-family: 'Georgia', 'Times New Roman', Times, serif;
+        }
+
+        .form-container {
+            max-width: 600px;
+            background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+            color: black;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .form-control {
+            background-color: #f1f8ff; /* Light background for input fields */
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+            .form-control:focus {
+                border-color: #0073e6;
+                box-shadow: 0 0 5px rgba(0, 115, 230, 0.5);
+            }
+
+        .btn-primary {
+            background-color: #0073e6; /* Matching blue button color */
+            border: none;
+        }
+
+            .btn-primary:hover {
+                background-color: #4b0082; /* Indigo color on hover */
+            }
+
+        .text-danger {
+            color: #ff5c5c; /* Red text for validation errors */
+        }
+
+        .back-link {
+            color: #ffffff;
+        }
+
+            .back-link:hover {
+                text-decoration: underline;
+                color: #e0f0ff;
+            }
+
+        .back-btn {
+            display: inline-block; /* Makes it behave like a button */
+            background-color: #007bff; /* Button background color (e.g., Bootstrap primary color) */
+            color: #fff; /* Text color */
+            padding: 10px 20px; /* Adds padding for a button-like appearance */
+            text-decoration: none; /* Removes underline */
+            border-radius: 5px; /* Optional: rounded corners */
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3; /* Darker shade on hover */
+                text-decoration: none;
+                color: #fff; /* Keep text color consistent */
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container d-flex justify-content-center">
+        <div class="form-container">
+            <h1 class="text-center">Expense Details</h1>
+            <h4>Expense Information</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.ItemName)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ItemName)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Amount)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Amount)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Account)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Account)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.ExpenseDate)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ExpenseDate)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Category)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Category)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CustomCategory)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CustomCategory)
+                </dd>
+
+                
+                <dt class="col-sm-3">Uploaded File</dt>
+                <dd class="col-sm-9">
+                    @if (Model.FileData != null)
+                    {
+                        <div>
+                            @if (Model.FileType != null && Model.FileType.StartsWith("image/"))
+                            {
+                                <!-- Display image if file type is an image -->
+                                <img src="@Url.Action("GetFile", "Expense", new { id = Model.ItemId })" alt="Uploaded Image" style="max-width: 100%; height: auto;" />
+                            }
+                            else if (Model.FileType == "application/pdf")
+                            {
+                                <p>
+                                    <a href="@Url.Action("GetFile", "Expense", new { id = Model.ItemId })" target="_blank">@Model.FileName</a>
+                                </p>
+                            }
+                            else
+                            {
+                                <!-- Provide download link for other file types -->
+                                <a href="@Url.Action("GetFile", "Expense", new { id = Model.ItemId })" class="btn btn-secondary">Download File</a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No file uploaded for this expense.</p>
+                    }
+                </dd>
+
+            </dl>
+           
+
+            <div class="text-center">
+                <a asp-action="Edit" asp-route-id="@Model?.ItemId" class="btn btn-primary btn-lg">Edit</a> |
+                <a asp-action="Index" class="back-btn">Back to List</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

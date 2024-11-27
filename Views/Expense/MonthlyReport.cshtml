@@ -1,0 +1,382 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Monthly Expense Report";
+}
+
+<h1 class="text-center display-5">Monthly Expense Report</h1>
+
+<!-- Filter Dropdown for Month Selection -->
+<div class="text-center mb-4">
+    <label for="monthFilter">Select Month:</label>
+    <select id="monthFilter" onchange="filterByMonth()">
+        <option value="all">All Months</option>
+        @foreach (var month in Model)
+        {
+            <option value="@month.Month.ToString("yyyy-MM")">@month.Month.ToString("MMMM yyyy")</option>  // data injection;
+        }
+    </select>
+</div>
+
+<!-- Line Chart -->
+<div id="linechart">
+    <canvas id="expenseLineChart" width="300" height="150"></canvas>
+</div>
+
+<!-- Pie Chart for Category Distribution -->
+
+<h2 class="text-center mt-4">Expenses by Category</h2>
+<canvas id="categoryPieChart" width="300" height="150" style="display: none;"></canvas>
+
+<!-- Table for displaying daily details in the selected month -->
+<table id="dailyExpenseTable" class="table table-striped table-bordered mt-4" style="display: none; width: 100%;">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Account</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<style>
+    body {
+        background: url('/images/pexels-rdne-7947846.jpg') no-repeat center center fixed;
+        background-size: cover;
+        background-blend-mode: overlay;
+        font-family: 'Georgia', 'Times New Roman', Times, serif;
+    }
+
+    #categoryPieChart {
+        max-width: 400px;
+        max-height: 400px;
+        display: block; /* Make the canvas block-level */
+        margin: 0 auto; /* Center horizontally */
+    }
+
+    /* Alternatively, you can use a flexbox container to center both horizontally and vertically */
+    .center-container {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        height: 100%; /* Make sure the container takes full height */
+    }
+
+    #linechart {
+        position: relative;
+        background: rgba(256, 256, 256, 0.9); /* White with 70% transparency */
+        border-radius: 10px; /* Optional: rounded corners */
+        padding: 10px; /* Optional: space around the canvas */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+    }
+
+
+
+    .container {
+        margin-top: 30px;
+    }
+
+    #monthFilter {
+        background-color: #e0f0ff;
+        border: 1px solid #ccc;
+        padding: 8px;
+        font-size: 1em;
+        border-radius: 5px;
+        width: auto;
+    }
+
+    #dailyExpenseTable {
+        font-size: 0.9em;
+        margin-top: 30px;
+    }
+
+    #dailyExpenseTable th, #dailyExpenseTable td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    #dailyExpenseTable th {
+        background-color: #4285f4; /* Blue header */
+        color: white;
+    }
+
+    #dailyExpenseTable td {
+        background-color: #f1f8ff; /* Light blue for rows */
+    }
+
+    .warning {
+        color: red;
+        font-weight: bold;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .table-dark th {
+        background-color: #4285f4; /* Dark blue header for table */
+        color: white;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const daysInMonth = Array.from({ length: 31 }, (_, i) => i + 1);
+    const dailyExpensesByMonth = {};
+
+    @* Prepare data for each month *@
+    @foreach (var month in Model)
+    {
+        <text>
+                dailyExpensesByMonth['@month.Month.ToString("yyyy-MM")'] = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(month.Expenses));
+        </text>
+    }
+
+        // Function to format data for each month in line chart
+        function formatLineChartData() {
+            const datasets = [];
+
+            for (const [month, expenses] of Object.entries(dailyExpensesByMonth)) {
+                const dailyAmounts = Array(31).fill(0);
+
+                // Aggregate daily expenses for each day of the month
+                expenses.forEach(expense => {
+                    const day = new Date(expense.ExpenseDate).getDate() - 1; // 0-based index
+                    dailyAmounts[day] += expense.Amount;
+                });
+
+                const generateIntermediateColor = () => {
+                    const r = 100 + Math.floor(Math.random() * 100);  // Ranges from 100 to 199
+                    const g = 100 + Math.floor(Math.random() * 100);  // Ranges from 100 to 199
+                    const b = 100 + Math.floor(Math.random() * 100);  // Ranges from 100 to 199
+                    return `rgba(${r}, ${g}, ${b}, 1)`;
+                };
+
+                // Add dataset for each month
+                datasets.push({
+                    label: month,
+                    data: dailyAmounts,
+                    fill: false,
+                    borderColor: generateIntermediateColor(),
+                    backgroundColor: generateIntermediateColor(),
+                    pointBackgroundColor: generateIntermediateColor(),
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    borderWidth: 2,
+                    tension: 0.4
+                });
+            }
+
+            return datasets;
+        }
+
+    // Create the line chart for daily expenses
+    const ctxLine = document.getElementById('expenseLineChart').getContext('2d');
+    let expenseLineChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: daysInMonth,
+            datasets: formatLineChartData()
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Day of Month'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Expense Amount'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+
+    // Update the line chart based on the selected month
+    function filterByMonth() {
+        const selectedMonth = document.getElementById("monthFilter").value;
+
+        if (selectedMonth === "all") {
+            expenseLineChart.data.datasets = formatLineChartData();
+            document.getElementById("dailyExpenseTable").style.display = "none";
+        } else {
+            const dailyAmounts = Array(31).fill(0);
+            const dailyExpenses = dailyExpensesByMonth[selectedMonth];
+
+            dailyExpenses.forEach(expense => {
+                const day = new Date(expense.ExpenseDate).getDate() - 1;
+                dailyAmounts[day] += expense.Amount;
+            });
+
+            expenseLineChart.data.datasets = [{
+                label: selectedMonth,
+                data: dailyAmounts,
+                fill: false,
+                borderColor: 'rgba(0, 128, 128, 1)', // Example static darker color
+                pointBackgroundColor: 'rgba(0, 128, 128, 1)',
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 2,
+                tension: 0.4
+            }];
+
+            const tableBody = document.getElementById("dailyExpenseTable").querySelector("tbody");
+            tableBody.innerHTML = "";
+
+            dailyExpenses.forEach(expense => {
+                const row = `<tr>
+                            <td>${new Date(expense.ExpenseDate).toLocaleDateString()}</td>
+                            <td>${expense.ItemName}</td>
+                            <td>${expense.Category}</td>
+                            <td>${expense.Amount.toFixed(2)}</td>
+                            <td>${expense.Account}</td>
+                        </tr>`;
+                tableBody.insertAdjacentHTML("beforeend", row);
+            });
+
+            document.getElementById("dailyExpenseTable").style.display = "table";
+        }
+
+        expenseLineChart.update();
+    }
+
+    // Data structure to hold category totals for all months
+    const categoryTotals = {};
+
+    // Aggregate category data for "All Months"
+    @foreach (var month in Model)
+    {
+        @foreach (var expense in month.Expenses)
+        {
+            <text>
+                    if (!categoryTotals['@expense.Category']) {
+                        categoryTotals['@expense.Category'] = 0;
+                                    }
+                    categoryTotals['@expense.Category'] += @expense.Amount;
+            </text>
+        }
+    }
+
+        // Static colors for pie chart categories
+        const pieChartColors = [
+        '#ff6347', // Tomato red
+        '#4682b4', // Steel blue
+        '#32cd32', // Lime green
+        '#ff1493', // Deep pink
+        '#ffd700', // Gold
+        '#8a2be2', // Blue violet
+        '#ff8c00', // Dark orange
+        '#f0e68c', // Khaki
+        '#2e8b57', // Sea green
+        '#dc143c'  // Crimson red
+    ];
+
+    // Function to update the pie chart for category distribution
+    function updateCategoryPieChart() {
+        const categories = Object.keys(categoryTotals);
+        const amounts = Object.values(categoryTotals);
+
+        if (categoryPieChart) {
+            categoryPieChart.destroy();
+        }
+
+        categoryPieChart = new Chart(document.getElementById('categoryPieChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Total Expense by Category',
+                    data: amounts,
+                    backgroundColor: categories.map((_, index) => pieChartColors[index % pieChartColors.length]), // Cycle through static colors
+                    borderColor: categories.map(() => '#fff'),
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize the pie chart on page load for "All Months"
+    let categoryPieChart;
+    updateCategoryPieChart();
+    document.getElementById("categoryPieChart").style.display = "block";
+
+    // Modify filterByMonth function to handle pie chart display
+    function filterByMonth() {
+        const selectedMonth = document.getElementById("monthFilter").value;
+
+        if (selectedMonth === "all") {
+            // Show all months' data in line chart and display the pie chart
+            expenseLineChart.data.datasets = formatLineChartData();
+            document.getElementById("dailyExpenseTable").style.display = "none";
+            document.getElementById("categoryPieChart").style.display = "block";
+        } else {
+            // Only show selected month in line chart and hide the pie chart
+            const dailyAmounts = Array(31).fill(0);
+            const dailyExpenses = dailyExpensesByMonth[selectedMonth];
+
+            dailyExpenses.forEach(expense => {
+                const day = new Date(expense.ExpenseDate).getDate() - 1;
+                dailyAmounts[day] += expense.Amount;
+            });
+
+            expenseLineChart.data.datasets = [{
+                label: selectedMonth,
+                data: dailyAmounts,
+                fill: false,
+                borderColor: 'rgba(0, 128, 128, 1)', // Example static darker color
+                pointBackgroundColor: 'rgba(0, 128, 128, 1)',
+                pointBorderColor: '#fff',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 2,
+                tension: 0.4
+            }];
+
+            const tableBody = document.getElementById("dailyExpenseTable").querySelector("tbody");
+            tableBody.innerHTML = "";
+
+            dailyExpenses.forEach(expense => {
+                const row = `<tr>
+                            <td>${new Date(expense.ExpenseDate).toLocaleDateString()}</td>
+                            <td>${expense.ItemName}</td>
+                            <td>${expense.Category}</td>
+                            <td>${expense.Amount.toFixed(2)}</td>
+                            <td>${expense.Account}</td>
+                        </tr>`;
+                tableBody.insertAdjacentHTML("beforeend", row);
+            });
+
+            document.getElementById("dailyExpenseTable").style.display = "table";
+            document.getElementById("categoryPieChart").style.display = "none";
+        }
+
+        // Update the line chart
+        expenseLineChart.update();
+    }
+</script>
+

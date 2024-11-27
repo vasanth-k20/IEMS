@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    /* Background gradient and overlay image */
+    body {
+        background: url('images/pexels-rdne-7947998.jpg') no-repeat center center fixed;
+        background-size: cover;
+        background-blend-mode: overlay;
+        font-family: Arial, sans-serif;
+        align-items:center;
+    }
+
+    /* Centered text styles */
+    .text-center h1.display-4 {
+        color: indianred; /* Dark blue for main header */
+        margin-top: 20px;
+        font-weight: normal;
+        font-family:  'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    .text-center h1.display-6{
+        color: indianred;
+        font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    .text-center h2.display-6 {
+        color: indianred; /* Dark gray for sub-headers */
+        font-family: 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        background-color: #1abc9c; /* Teal color for primary action buttons */
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 20px 10px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #16a085; /* Darker teal on hover */
+            transform: translateY(-5px); /* Button lift effect */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+        }
+
+    #intro {
+        position: relative;
+        background: rgba(256, 256, 256, 0.5); /* White with 70% transparency */
+        border-radius: 20px; /* Optional: rounded corners */
+        padding: 10px; /* Optional: space around the canvas */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%)
+    }
+
+</style>
+
+
+    
+        <div class="text-center" id="intro">
+            <h1 class="display-4">Welcome</h1>
+            <h1 class="display-6">to</h1>
+            <h2 class="display-6">Income and Expense Management System</h2>
+
+            <!-- Action buttons for navigation -->
+            <button class="btn-primary" onclick="location.href='@Url.Action("Index", "Income")'">Add Income</button>
+            <button class="btn-primary" onclick="location.href='@Url.Action("Index", "Expense")'">Add Expense</button>
+        </div>
+    

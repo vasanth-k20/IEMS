@@ -1,0 +1,260 @@
+﻿@model IEnumerable<IEMS.Models.Income>
+
+@{
+    ViewData["Title"] = "Income Index";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+   
+
+    <style>
+        /* Global Background and Font */
+        body {
+            font-family: Arial, sans-serif;
+            background: url('images/pexels-pixabay-164527.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-blend-mode: overlay;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container and Section Spacing */
+        .container {
+            margin-top: 40px;
+        }
+
+        /* Title Styling */
+        h1 {
+            font-family : 'Lucida Handwriting';
+            position: relative;
+            background: rgba(256, 256, 256, 0.5); /* White with 70% transparency */
+            border-radius: 20px; /* Optional: rounded corners */
+            padding: 10px; /* Optional: space around the canvas */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+            font-size: 2rem;
+            font-weight: 600;
+            color: indianred;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Card Styling */
+        .card {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            border-radius: 10px;
+            background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+            
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #6c63ff;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+
+        .card-body {
+            background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+           
+            padding: 20px;
+            color: #555;
+        }
+
+        .card-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        /* Flex Container for Cards */
+        .flex-container {
+            display: flex;
+            gap: 20px; /* Space between the cards */
+            justify-content: center; /* Align cards horizontally in the center */
+            flex-wrap: wrap; /* Ensure cards stack on smaller screens */
+        }
+
+            /* Equal Card Width */
+            .flex-container .card {
+                flex: 1 1 calc(50% - 40px); /* Ensure two cards fit side by side */
+                max-width: 400px; /* Limit the maximum width of the cards */
+            }
+
+        /* Button Styling */
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #6c63ff;
+            color: #fff;
+        }
+
+            .btn-primary:hover {
+                background-color: #524ac5;
+            }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+
+            .btn-info:hover {
+                background-color: #117a8b;
+            }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+            .btn-danger:hover {
+                background-color: #c0392b;
+            }
+
+        /* Table Styling */
+        .table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+            .table th, .table td {
+                padding: 12px;
+                text-align: center;
+            }
+
+            .table th {
+                background-color: #6c63ff;
+                color: white;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .table td {
+                background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+                color: black;
+            }
+
+        /* Create Button Styling */
+        .create-btn {
+            display: inline-block;
+            background-color: #6c63ff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+            .create-btn:hover {
+                background-color: #524ac5;
+                color: orangered;
+            }
+    </style>
+</head>
+<body>
+
+    <h1>Income Overview</h1>
+
+    <div class="container">
+        <div class="text-center mb-4">
+            <a asp-action="Create" class="create-btn">Add New Income</a>
+        </div>
+
+        <!-- Flex Container for Cards -->
+        <div class="flex-container">
+            <!-- Card 1: Income Summary -->
+            <div class="card">
+                <div class="card-header">Income Summary</div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <span>Total Income:</span>
+                        <span>&#8377;@((decimal)ViewData["TotalIncome"])</span>
+                    </div>
+                    <div class="card-text">
+                        <span>Total Expenses:</span>
+                        <span>&#8377;@((decimal)ViewData["TotalExpenses"])</span>
+                    </div>
+                    <div class="card-text">
+                        <span>Income Remaining:</span>
+                        <span>&#8377;@((decimal)ViewData["RemainingBalance"])</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Credit Card Income Summary -->
+            <div class="card">
+                <div class="card-header">Credit Card Income Summary</div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <span>Total Income (Credit Card):</span>
+                        <span>&#8377;@((decimal)ViewData["CreditCardIncome"])</span>
+                    </div>
+                    <div class="card-text">
+                        <span>Remaining Balance (Credit Card):</span>
+                        <span>&#8377;@((decimal)ViewData["CreditCardRemainingBalance"])</span>
+                    </div>
+                    <div class="card-text">
+                        <span>Due Date:</span>
+                        <span>7th on EveryMonth</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Table -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Source)</th>
+                    <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                    <th>@Html.DisplayNameFor(model => model.Date)</th>
+                    <th>@Html.DisplayNameFor(model => model.Account)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Source)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Amount)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Account)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                           
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

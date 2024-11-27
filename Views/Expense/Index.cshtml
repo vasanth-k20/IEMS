@@ -1,0 +1,241 @@
+﻿@model IEnumerable<IEMS.Models.Expense>
+
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* General Styling */
+        body {
+            background: url('/images/pexels-olia-danilevich-5466785.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-blend-mode: overlay;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-family: 'Lucida Handwriting';
+            position: relative;
+            background: rgba(256, 256, 256, 0.5); /* White with 70% transparency */
+            border-radius: 20px; /* Optional: rounded corners */
+            padding: 10px; /* Optional: space around the canvas */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+            font-size: 2rem;
+            font-weight: 600;
+            color: indianred;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        /* Card Styles */
+        .card {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            border-radius: 10px;
+            background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #6c63ff;
+            color: white;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+
+        .card-body {
+            background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+            padding: 20px;
+            color: #555;
+        }
+
+        .card-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-weight: 500;
+            border: none;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #6c63ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #524ac5;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #117a8b;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .create-btn {
+            background-color: #1abc9c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            text-decoration: none;
+            margin: 10px;
+        }
+
+        .create-btn:hover {
+            background-color: #16a085;
+        }
+
+        /* Table Styles */
+        .table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #6c63ff;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .table td {
+                background: rgba(256, 256, 256, 0.7); /* White with 70% transparency */
+            color: black;
+        }
+
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Expenses Overview</h1>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">Income and Expenses</div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Total Income:</strong>
+                    <span>&#8377;@((decimal)ViewData["TotalIncome"])</span>
+                </p>
+                <p class="card-text">
+                    <strong>Total Expenses:</strong>
+                    <span>&#8377;@((decimal)ViewData["TotalExpenses"])</span>
+                </p>
+                <p class="card-text">
+                    <strong>Remaining Balance:</strong>
+                    <span>&#8377;@((decimal)ViewData["RemainingBalance"])</span>
+                </p>
+            </div>
+        </div>
+
+        @if ((decimal)ViewData["RemainingBalance"] < 0)
+        {
+            <p class="warning">Warning: Your balance is negative!</p>
+        }
+
+        <div class="text-center">
+            <a asp-action="Create" class="create-btn">Create New Expense</a>
+            <a asp-action="MonthlyReport" class="create-btn">View Monthly Report</a>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.ItemName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                    <th>@Html.DisplayNameFor(model => model.Account)</th>
+                    <th>@Html.DisplayNameFor(model => model.ExpenseDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Category)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.ItemName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Amount)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Account)</td>
+                        <td>@Html.DisplayFor(modelItem => item.ExpenseDate)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.ItemId" class="btn btn-primary">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.ItemId" class="btn btn-info">Details</a>
+                            <a asp-action="Delete" asp-route-id="@item.ItemId" class="btn btn-danger">Delete</a>
+                           
+
+
+                            @if (!string.IsNullOrEmpty(item.Description))
+                            {
+                                <i class="fas fa-info-circle" title="@item.Description" style="cursor: pointer;"></i>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+
+   
